@@ -6,28 +6,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: build and push to docker
-      uses: docker/build-push-action@v1
+    #- name: build and push to docker
+    #  uses: docker/build-push-action@v1
+    #  with:
+    #    username: ${{ secrets.DOCKER_USERNAME }}
+    #    password: ${{ secrets.DOCKER_PASSWORD }}
+    #    repository: ${{ github.repository }}
+    #    #repository: ${{ secrets.DOCKER_REPOSITORY }}
+    #    tag_with_ref: true
+    #    tag_with_sha: true
+    #    tags: ${{ github.sha }}
+    - name: Post a message in a channel
+      uses: slackapi/slack-github-action@v2.0.0
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: ${{ github.repository }}
-        #repository: ${{ secrets.DOCKER_REPOSITORY }}
-        tag_with_ref: true
-        tag_with_sha: true
-        tags: ${{ github.sha }}
-    #- name: deploy to cluster
-    #  uses: steebchen/kubectl@master
-    #  env:
-    #    KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-    #  with:
-    #    args: set image --record deployment/my-app prueba-gha=${{ github.repository }}:${{ github.sha }}
-    #- name: verify deployment
-    #  uses: steebchen/kubectl@master
-    #  env:
-    #    KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-    #    KUBECTL_VERSION: "1.21.0"
-    #  with:
-    #    args: "rollout status deployment/my-app"
+        webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+        webhook-type: incoming-webhook
+        payload: |
+          text: "*GitHub Action build result*: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+          blocks:
+            - type: "section"
+              text:
+                type: "mrkdwn"
+                text: "papa vamos a camperizar el lang rover "
+                #text: "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+    # - name: deploy to cluster
+    #   uses: steebchen/kubectl@master
+    #   env:
+    #     KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+    #   with:
+    #     args: set image --record deployment/franr gha=${{ github.repository }}:${{ github.sha }}
+    # - name: verify deployment
+    #   uses: steebchen/kubectl@master
+    #   env:
+    #     KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+    #     KUBECTL_VERSION: "1.21.0"
+    #   with:
+    #     args: "rollout status deployment/franr"
+
         
 
